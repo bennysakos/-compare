@@ -604,3 +604,20 @@ class RTanksScraper:
         """Close the aiohttp session."""
         if self.session and not self.session.closed:
             await self.session.close()
+
+
+    async def get_online_players_count(self):
+        """Scrape the RTanks main page and count online players."""
+        session = await self._get_session()
+        try:
+            async with session.get(f"{self.base_url}/") as response:
+                if response.status != 200:
+                    return 0
+                html = await response.text()
+                soup = BeautifulSoup(html, 'html.parser')
+                online_spans = soup.find_all('span', {'class': 'text-success'})
+                return len(online_spans)
+        except Exception as e:
+            logger.error(f"Error scraping online players: {e}")
+            return 0
+    
