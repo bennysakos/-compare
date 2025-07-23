@@ -427,7 +427,7 @@ class RTanksBot(commands.Bot):
             kd_loser = ""
         
         embed.add_field(
-            name="K/D Ratio",
+            name="K/D",
             value=f"{kd_winner}\n{kd_loser}".strip(),
             inline=True
         )
