@@ -61,8 +61,6 @@ class RTanksBot(commands.Bot):
         logger.info(f'Bot is in {len(self.guilds)} guilds')
         
         # Set bot status
-        activity = discord.Game(name="RTanks Online")
-        await self.change_presence(activity=activity)
 
     @discord.app_commands.describe(username="RTanks player username to lookup")
     async def player_command_handler(self, interaction: discord.Interaction, username: str):
@@ -508,6 +506,19 @@ class RTanksBot(commands.Bot):
         """Global error handler."""
         logger.error(f"Command error: {error}")
         
+    
+    async def _update_online_status_task(self):
+        """Background task to update bot status with number of online players."""
+        await self.wait_until_ready()
+        while not self.is_closed():
+            try:
+                count = await self.scraper.get_online_players_count()
+                activity = discord.Activity(type=discord.ActivityType.watching, name=f"{count} players online")
+                await self.change_presence(activity=activity)
+            except Exception as e:
+                logger.warning(f"Failed to update online player count: {e}")
+            await asyncio.sleep(30)
+
     async def close(self):
         """Clean up when bot is closing."""
         await self.scraper.close()
