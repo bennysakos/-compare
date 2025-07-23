@@ -607,7 +607,7 @@ class RTanksScraper:
 
 
     async def get_online_players_count(self):
-        """Scrape the RTanks main page and count online players."""
+        """Scrape the RTanks main page and extract the online player count."""
         session = await self._get_session()
         try:
             async with session.get(f"{self.base_url}/") as response:
@@ -615,9 +615,15 @@ class RTanksScraper:
                     return 0
                 html = await response.text()
                 soup = BeautifulSoup(html, 'html.parser')
-                online_spans = soup.find_all('span', {'class': 'text-success'})
-                return len(online_spans)
+
+                # Search for the text that contains 'Online players:'
+                text_match = soup.find(string=lambda text: text and "Online players:" in text)
+                if text_match:
+                    import re
+                    match = re.search(r'Online players:\s*(\d+)', text_match)
+                    if match:
+                        return int(match.group(1))
+                return 0
         except Exception as e:
             logger.error(f"Error scraping online players: {e}")
             return 0
-    
