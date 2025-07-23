@@ -607,7 +607,7 @@ class RTanksScraper:
 
 
     async def get_online_players_count(self):
-        """Extract the player count from the 'Online players:' container properly."""
+        """Extract the online player count more flexibly (final version)."""
         session = await self._get_session()
         try:
             async with session.get(f"{self.base_url}/") as response:
@@ -618,16 +618,16 @@ class RTanksScraper:
                 html = await response.text()
                 soup = BeautifulSoup(html, 'html.parser')
 
-                # Find the element containing the label
                 for div in soup.find_all('div'):
                     if div.text.strip().startswith("Online players:"):
-                        strong = div.find('strong')
-                        if strong and strong.text.isdigit():
-                            count = int(strong.text)
-                            logger.info(f"Extracted count from <strong>: {count}")
+                        import re
+                        match = re.search(r'Online players:\s*(\d+)', div.text)
+                        if match:
+                            count = int(match.group(1))
+                            logger.info(f"Extracted fallback count from div.text: {count}")
                             return count
                         else:
-                            logger.warning("Found container but <strong> missing or not numeric.")
+                            logger.warning("Found container but no number matched in text.")
                         break
 
                 logger.warning("Could not find 'Online players:' container.")
