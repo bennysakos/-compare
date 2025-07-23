@@ -42,6 +42,7 @@ class RTanksBot(commands.Bot):
         self.scraper = RTanksScraper()
     
     async def setup_hook(self):
+        self.loop.create_task(self._update_online_status_task())
         """Setup hook called when bot is starting up."""
         # Register commands with the command tree
         self.tree.command(name="player", description="Get RTanks player statistics")(self.player_command_handler)
@@ -427,7 +428,7 @@ class RTanksBot(commands.Bot):
             kd_loser = ""
         
         embed.add_field(
-            name="K/D",
+            name="K/D Ratio",
             value=f"{kd_winner}\n{kd_loser}".strip(),
             inline=True
         )
