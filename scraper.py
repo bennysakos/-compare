@@ -607,7 +607,7 @@ class RTanksScraper:
 
 
     async def get_online_players_count(self):
-        """Scrape the RTanks main page and extract the online player count (debug mode)."""
+        """Extract the player count from the 'Online players:' container properly."""
         session = await self._get_session()
         try:
             async with session.get(f"{self.base_url}/") as response:
@@ -616,24 +616,21 @@ class RTanksScraper:
                     return 0
 
                 html = await response.text()
-                logger.info("Fetched RTanks HTML (first 500 chars):")
-                logger.info(html[:500])
-
                 soup = BeautifulSoup(html, 'html.parser')
 
-                text_match = soup.find(string=lambda text: text and "Online players:" in text)
-                if text_match:
-                    logger.info(f"Matched text line: {text_match}")
-                    import re
-                    match = re.search(r'Online players:\s*(\d+)', text_match)
-                    if match:
-                        logger.info(f"Extracted online count: {match.group(1)}")
-                        return int(match.group(1))
-                    else:
-                        logger.warning("Regex match failed on matched text.")
-                else:
-                    logger.warning("Could not find 'Online players:' in page.")
+                # Find the element containing the label
+                for div in soup.find_all('div'):
+                    if div.text.strip().startswith("Online players:"):
+                        strong = div.find('strong')
+                        if strong and strong.text.isdigit():
+                            count = int(strong.text)
+                            logger.info(f"Extracted count from <strong>: {count}")
+                            return count
+                        else:
+                            logger.warning("Found container but <strong> missing or not numeric.")
+                        break
 
+                logger.warning("Could not find 'Online players:' container.")
                 return 0
         except Exception as e:
             logger.error(f"Error scraping online players: {e}")
