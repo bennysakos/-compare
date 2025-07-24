@@ -108,7 +108,55 @@ class RTanksBot(commands.Bot):
         player1="First RTanks player username",
         player2="Second RTanks player username"
     )
-    async def compare_command_handler(self, interaction: discord.Interaction, player1: str, player2: str):
+    
+    @discord.app_commands.command(name="ruplayer", description="Показать информацию об игроке (на русском языке)")
+    @discord.app_commands.describe(username="Имя игрока RTanks для поиска")
+    async def ruplayer(self, interaction: discord.Interaction, username: str):
+        """Показывает статистику игрока RTanks на русском языке."""
+        await interaction.response.defer()
+
+        try:
+            data = await self.scraper.get_player_data(username.strip())
+            if not data:
+                embed = discord.Embed(
+                    title="❌ Игрок не найден",
+                    description=f"Не удалось найти данные для `{username}`. Проверьте имя и попробуйте снова.",
+                    color=0xff0000
+                )
+                await interaction.followup.send(embed=embed)
+                return
+
+            embed = discord.Embed(
+                title=f"{data['username']} — {data['rank']}",
+                color=discord.Color.green()
+            )
+            embed.set_footer(text="RTanks Онлайн — Данные игрока")
+
+            embed.add_field(name="Статус", value="🟢 В игре" if data['is_online'] else "🔴 Не в сети", inline=True)
+            embed.add_field(name="Опыт", value=f"{data['experience']:,}", inline=True)
+            embed.add_field(name="У/П", value=data['kd_ratio'], inline=True)
+            embed.add_field(name="Уничтожил", value=f"{data['kills']:,}", inline=True)
+            embed.add_field(name="Подбит", value=f"{data['deaths']:,}", inline=True)
+            embed.add_field(name="Премиум", value="✅ Да" if data['premium'] else "❌ Нет", inline=True)
+            embed.add_field(name="Группа", value=data['group'], inline=True)
+
+            turrets = ', '.join(data['equipment']['turrets']) or "Нет"
+            hulls = ', '.join(data['equipment']['hulls']) or "Нет"
+            embed.add_field(name="Орудия", value=turrets, inline=False)
+            embed.add_field(name="Корпуса", value=hulls, inline=False)
+
+            await interaction.followup.send(embed=embed)
+        except Exception as e:
+            logger.error(f"Ошибка при выполнении ruplayer: {e}")
+            embed = discord.Embed(
+                title="⚠️ Ошибка",
+                description="Произошла ошибка при получении данных об игроке. Попробуйте позже.",
+                color=0xffa500
+            )
+            await interaction.followup.send(embed=embed)
+
+
+async def compare_command_handler(self, interaction: discord.Interaction, player1: str, player2: str):
         """Slash command to compare two RTanks players."""
         await interaction.response.defer()
         
