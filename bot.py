@@ -48,6 +48,7 @@ class RTanksBot(commands.Bot):
         self.tree.command(name="player", description="Get RTanks player statistics")(self.player_command_handler)
         self.tree.command(name="botstats", description="Display bot performance statistics")(self.botstats_command_handler)
         self.tree.command(name="compare", description="Compare two RTanks players")(self.compare_command_handler)
+        self.tree.command(name="ruplayer", description="Получить статистику игрока RTanks на русском")(self.ruplayer_command_handler)
         
         try:
             synced = await self.tree.sync()
