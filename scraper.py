@@ -91,7 +91,7 @@ class RTanksScraper:
             logger.error(f"Error in get_player_data: {e}")
             return None
     
-   async def _parse_player_data(self, html, username):
+      async def _parse_player_data(self, html, username):
     """Parse player data from HTML response."""
     try:
         soup = BeautifulSoup(html, 'html.parser')
