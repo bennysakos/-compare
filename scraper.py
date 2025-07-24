@@ -91,39 +91,37 @@ class RTanksScraper:
             logger.error(f"Error in get_player_data: {e}")
             return None
     
-    async def _parse_player_data(self, html, username):
-        """Parse player data from HTML response."""
-        try:
-            soup = BeautifulSoup(html, 'html.parser')
-           logger.info(f"Parsing data for {username}")
+   async def _parse_player_data(self, html, username):
+    """Parse player data from HTML response."""
+    try:
+        soup = BeautifulSoup(html, 'html.parser')
+        logger.info(f"Parsing data for {username}")
 
-soup = BeautifulSoup(html, 'html.parser')
+        # Try to extract the actual display name (e.g., [Clan] Name)
+        name_header = soup.find('h1')
+        if name_header:
+            displayed_name = name_header.get_text(strip=True)
+            logger.info(f"Extracted display name: {displayed_name}")
+        else:
+            displayed_name = username
+            logger.warning("Display name <h1> tag not found, using input username")
 
-# Try to extract the actual display name (e.g., [Clan] Name)
-name_header = soup.find('h1')
-if name_header:
-    displayed_name = name_header.get_text(strip=True)
-    logger.info(f"Extracted display name: {displayed_name}")
-else:
-    displayed_name = username
-    logger.warning("Display name <h1> tag not found, using input username")
-
-# Initialize player data
-player_data = {
-    'username': displayed_name,
-    'rank': 'Unknown',
-    'experience': 0,
-    'kills': 0,
-    'deaths': 0,
-    'kd_ratio': '0.00',
-    'gold_boxes': 0,
-    'premium': False,
-    'group': 'Unknown',
-    'is_online': False,
-    'status_indicator': '🔴',
-    'equipment': {'turrets': [], 'hulls': []}
-}
-            
+        # Initialize player data
+        player_data = {
+            'username': displayed_name,
+            'rank': 'Unknown',
+            'experience': 0,
+            'kills': 0,
+            'deaths': 0,
+            'kd_ratio': '0.00',
+            'gold_boxes': 0,
+            'premium': False,
+            'group': 'Unknown',
+            'is_online': False,
+            'status_indicator': '🔴',
+            'equipment': {'turrets': [], 'hulls': []}
+        }
+        
             # Debug: Log some of the HTML to understand structure
             logger.info(f"HTML contains 'offline': {'offline' in html.lower()}")
             logger.info(f"HTML contains 'online': {'online' in html.lower()}")
