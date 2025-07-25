@@ -620,21 +620,24 @@ class RTanksScraper:
                     if max_num > player_data['experience']:
                         player_data['experience'] = max_num
             
-            # Final validation — detect fake/fallback player
-if (
-    player_data['rank'] == 'Unknown'
-    and player_data['experience'] <= 50  # very low, like 14
-    and player_data['kills'] == 0
-    and player_data['deaths'] == 0
-    and player_data['gold_boxes'] == 0
-    and not player_data['equipment']['turrets']
-    and not player_data['equipment']['hulls']
-):
-    logger.warning(f"Likely invalid player: {username} — returning None")
-    return None
+            # End of your try block
+        # (Indentation will be inside the function, NOT inside the try anymore)
 
-return player_data
-            
+    # ✅ Now OUTSIDE the try block — final check
+    if (
+        player_data['rank'] == 'Unknown'
+        and player_data['experience'] <= 50
+        and player_data['kills'] == 0
+        and player_data['deaths'] == 0
+        and player_data['gold_boxes'] == 0
+        and not player_data['equipment']['turrets']
+        and not player_data['equipment']['hulls']
+    ):
+        logger.warning(f"Likely invalid player: {username} — returning None")
+        return None
+
+    return player_data
+    
         except Exception as e:
             logger.error(f"Error parsing table row: {e}")
             return None
