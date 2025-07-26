@@ -48,6 +48,7 @@ async def main():
     try:
         logger.info("Starting RTanks Discord Bot...")
         await bot.start(token)
+            await asyncio.sleep(5)  # Add small delay to reduce chance of rate-limit
     except KeyboardInterrupt:
         logger.info("Bot stopped by user")
     except Exception as e:
