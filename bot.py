@@ -346,7 +346,7 @@ class RTanksBot(commands.Bot):
         )
         
         # Player rank and basic info - make rank emoji bigger
-        rank_emoji = get_rank_emoji(player_data['rank'])
+        rank_emoji = get_rank_emoji(player_data['rank'], premium=player_data.get('premium', False))
         
         # Extract the emoji ID from the custom Discord emoji and use it as thumbnail
         import re
@@ -450,7 +450,7 @@ class RTanksBot(commands.Bot):
         )
         
         # Player rank and basic info - make rank emoji bigger
-        rank_emoji = get_rank_emoji(player_data['rank'])
+        rank_emoji = get_rank_emoji(player_data['rank'], premium=player_data.get('premium', False))
         
         # Extract the emoji ID from the custom Discord emoji and use it as thumbnail
         import re
