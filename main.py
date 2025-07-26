@@ -12,6 +12,8 @@ import threading
 from keepalive import run
 
 from bot import RTanksBot
+import patched_rank_emoji  # this will patch get_rank_emoji for the bot
+
 
 # Load environment variables
 load_dotenv()
